@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="초등학교 6학년 1반을 위한 학급경제교실 & 게이미피케이션 웹 앱 - 다이스(DICE)">
+  <title>다이스(DICE) - 6학년 1반 학급경영 & 게이미피케이션 플랫폼</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-icon-box">🎲</div>
+        <div class="brand-text">
+          <h1>다이스 <span class="brand-badge">6-1 학급경제</span></h1>
+          <div class="brand-sub">Dream, Incentive, Class Economy</div>
+        </div>
+      </div>
+
+      <!-- Quick Mode Switcher (No Login Needed) -->
+      <nav class="mode-switcher-wrap" aria-label="모드 전환 네비게이션">
+        <button id="btnTeacherMode" class="mode-tab-btn" type="button">
+          <span>👩‍🏫</span> 선생님 화면
+        </button>
+        <button id="btnStudentMode" class="mode-tab-btn active" type="button">
+          <span>🎒</span> 학생 화면
+        </button>
+
+        <div id="studentSelectWrap" class="student-select-wrap">
+          <select id="studentSelectDropdown" class="student-dropdown" aria-label="학생 선택 드롭다운">
+            <!-- Populated dynamically: 1번 강민준 ~ 25번 한태양 -->
+          </select>
+        </div>
+      </nav>
+
+      <!-- Utility Actions -->
+      <div class="header-actions">
+        <button id="btnSoundToggle" class="btn-sound-toggle" type="button" title="소리 토글">🔔</button>
+        <button id="btnDataReset" class="btn-data-reset" type="button" title="데이터 초기화">🔄</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-main">
+
+    <!-- ====================================================================
+         1. STUDENT VIEW (학생 화면)
+         ==================================================================== -->
+    <section id="studentView" aria-label="학생 대시보드">
+      <!-- Hero Banner: Profile, Wallet, Level Gauge -->
+      <div class="student-hero-banner">
+        <div class="student-hero-top">
+          <div class="student-identity">
+            <div id="stAvatar" class="student-avatar-big">👦</div>
+            <div class="student-title-box">
+              <h2>
+                <span id="stName">1번 강민준</span>
+                <span id="stLevelBadge" class="level-title-badge">Lv.1 성실한 새싹</span>
+              </h2>
+              <p>오늘도 활기차게 우리 반을 빛내는 6학년 1반 주인공!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="student-kpi-grid">
+          <!-- Wallet Card -->
+          <div class="wallet-card">
+            <div>
+              <div class="wallet-info-sub">내 학급 지갑 잔액</div>
+              <div class="wallet-amount-wrap">
+                <span id="stBalance" class="wallet-amount">120</span>
+                <span id="stCurrencyUnit" class="wallet-unit">골드</span>
+              </div>
+            </div>
+            <div class="coin-icon-visual">🪙</div>
+          </div>
+
+          <!-- Level & EXP Progress Card -->
+          <div class="level-progress-card">
+            <div class="level-header-row">
+              <span class="level-tag">성장 경험치 (EXP)</span>
+              <span id="stExpValues" class="exp-numbers">240 / 250 XP</span>
+            </div>
+            <div class="exp-bar-track">
+              <div id="stExpProgressFill" class="exp-bar-fill" style="width: 75%;"></div>
+            </div>
+            <div class="level-tip">
+              <span>* 상점에서 돈을 써도 레벨과 경험치는 줄어들지 않아요!</span>
+              <span id="stExpNextNeeded" style="font-weight: 700; color: var(--blue-primary);">다음 레벨까지 10 XP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Content 2-Column Grid -->
+      <div class="student-content-grid">
+        <!-- Left: Today's Tasks & 1-Person 1-Role -->
+        <div>
+          <div class="section-panel">
+            <div class="section-panel-header">
+              <h3><span>📌</span> 오늘 할 일 (1인 1역)</h3>
+            </div>
+
+            <!-- Job Card -->
+            <div class="job-hero-card">
+              <div class="job-card-top">
+                <div class="job-role-info">
+                  <div id="stJobIcon" class="job-icon-box">🧹</div>
+                  <div class="job-title-text">
+                    <h4 id="stJobTitle">칠판 지우개 관리관</h4>
+                    <span id="stJobWage" class="job-reward-tag">일급 +10 골드</span>
+                  </div>
+                </div>
+              </div>
+              <div id="stJobDesc" class="job-desc">
+                쉬는 시간 및 수업 종료 후 칠판을 깨끗이 지우고 분필 가루를 털어냅니다.
+              </div>
+              <div class="job-action-row">
+                <div id="stJobStatusContainer">
+                  <!-- Injected status pill -->
+                </div>
+                <button id="btnCompleteJob" class="btn btn-cta-orange" type="button">
+                  오늘 역할 완료 ✨
+                </button>
+              </div>
+            </div>
+
+            <!-- Daily Quests -->
+            <div style="margin-top: 16px;">
+              <h4 style="font-size: 14.5px; font-weight: 800; color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                <span>🎯</span> 오늘의 학급 퀘스트
+              </h4>
+              <div id="stMissionList" class="daily-mission-list">
+                <!-- Dynamically loaded quests -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Store & My Inventory -->
+        <div>
+          <!-- Class Store Preview -->
+          <div class="section-panel">
+            <div class="section-panel-header">
+              <h3><span>🛒</span> 학급 상점</h3>
+              <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">원하는 쿠폰/보상을 교환하세요</span>
+            </div>
+            <div id="stStoreGrid" class="store-grid">
+              <!-- Dynamically populated products -->
+            </div>
+          </div>
+
+          <!-- My Inventory (Coupons) -->
+          <div class="section-panel">
+            <div class="section-panel-header">
+              <h3><span>🎒</span> 내 쿠폰 보관함</h3>
+            </div>
+            <div id="stInventoryList" class="inventory-list">
+              <!-- Dynamically populated purchased coupons -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         2. TEACHER VIEW (선생님 관리 화면)
+         ==================================================================== -->
+    <section id="teacherView" style="display: none;" aria-label="선생님 관리 대시보드">
+      <!-- Teacher KPI Header Banner -->
+      <div class="teacher-kpi-banner">
+        <div class="teacher-kpi-banner-top">
+          <h2><span>👩‍🏫</span> 6학년 1반 학급경영 총괄 현황</h2>
+          <button id="btnOpenBulkPay" class="btn btn-cta-orange" type="button">
+            <span>🎁</span> 전체 학생 일괄 지급
+          </button>
+        </div>
+
+        <div class="kpi-cards-row">
+          <div class="kpi-stat-card">
+            <div class="kpi-stat-label">총 유통 화폐</div>
+            <div class="kpi-stat-value">
+              <span id="kpiTotalIssued">3,850</span> <small id="kpiTotalIssuedUnit">골드</small>
+            </div>
+          </div>
+          <div class="kpi-stat-card">
+            <div class="kpi-stat-label">학급 평균 레벨</div>
+            <div class="kpi-stat-value">
+              <span id="kpiAvgLevel">Lv.2</span> <small id="kpiAvgExp">(평균 280 XP)</small>
+            </div>
+          </div>
+          <div class="kpi-stat-card">
+            <div class="kpi-stat-label">오늘 1인 1역 완료 현황</div>
+            <div class="kpi-stat-value">
+              <span id="kpiJobsCompleted" style="color: var(--blue-primary);">14 / 25명</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teacher Navigation Sub-Tabs -->
+      <div class="teacher-nav-tabs">
+        <button class="teacher-tab-btn active" data-tab="students" type="button">👥 학생 명단 & 화폐 관리</button>
+        <button class="teacher-tab-btn" data-tab="jobs" type="button">📋 1인 1역 배정/관리</button>
+        <button class="teacher-tab-btn" data-tab="store" type="button">🛒 상점 상품/재고 관리</button>
+        <button class="teacher-tab-btn" data-tab="history" type="button">📜 화폐 입출금 전체 로그</button>
+      </div>
+
+      <!-- Tab 1: Students Table Section -->
+      <div id="teacherSectionStudents" class="student-table-container">
+        <div class="table-action-bar">
+          <div class="search-input-wrap">
+            <input type="text" id="teacherStudentSearch" class="search-input" placeholder="학생 번호 또는 이름 검색...">
+          </div>
+          <div style="font-size: 13px; font-weight: 700; color: var(--text-muted);">
+            총 25명 등록됨 (화폐 지급 버튼으로 즉시 보상 부여)
+          </div>
+        </div>
+
+        <table class="class-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">번호</th>
+              <th style="width: 130px;">이름</th>
+              <th style="width: 140px;">현재 잔액</th>
+              <th style="width: 150px;">레벨 & 누적 경험치</th>
+              <th>담당 1인 1역</th>
+              <th style="min-width: 120px;">오늘 수행</th>
+              <th style="min-width: 260px;">화폐 관리 액션</th>
+            </tr>
+          </thead>
+          <tbody id="teacherStudentTableBody">
+            <!-- Dynamically populated 25 students -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tab 2: Jobs Management Section -->
+      <div id="teacherSectionJobs" style="display: none;">
+        <div class="section-panel-header" style="margin-bottom: 12px;">
+          <h3 style="font-size: 17px; font-weight: 800; color: var(--text-primary);">1인 1역 직무 목록 및 학생 배정</h3>
+        </div>
+        <div id="teacherJobsList">
+          <!-- Dynamically populated jobs with assignment dropdowns -->
+        </div>
+      </div>
+
+      <!-- Tab 3: Store Management Section -->
+      <div id="teacherSectionStore" style="display: none;">
+        <div class="section-panel-header" style="margin-bottom: 12px;">
+          <h3 style="font-size: 17px; font-weight: 800; color: var(--text-primary);">학급 상점 상품 및 쿠폰 관리</h3>
+          <button id="btnOpenAddProduct" class="btn btn-cta-orange" type="button">
+            <span>+</span> 새 상품 등록
+          </button>
+        </div>
+        <div id="teacherStoreGrid" class="store-grid">
+          <!-- Dynamically populated store items with edit/delete -->
+        </div>
+      </div>
+
+      <!-- Tab 4: History Section -->
+      <div id="teacherSectionHistory" style="display: none;" class="section-panel">
+        <div class="section-panel-header">
+          <h3><span>📜</span> 전체 화폐 지급 및 사용 내역</h3>
+        </div>
+        <div id="teacherTxList" class="daily-mission-list">
+          <!-- Dynamically populated transactions -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================
+       MODALS
+       ====================================================================== -->
+
+  <!-- Modal 1: Individual Currency Pay / Deduct -->
+  <div id="currencyModal" class="modal-backdrop">
+    <div class="modal-content-card">
+      <div class="modal-header">
+        <h3>💰 화폐 지급 / 차감</h3>
+        <button class="btn-modal-close" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background-color: var(--bg-surface-blue); padding: 12px 16px; border-radius: var(--radius-md);">
+          <strong id="modalStudentInfo" style="color: var(--blue-primary); font-size: 15px;">1번 강민준</strong>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="payAmountInput">금액</label>
+          <input type="number" id="payAmountInput" class="form-input" min="1" value="10" placeholder="금액 입력">
+          <div class="quick-amount-tags">
+            <button type="button" class="amount-tag-btn" data-amount="5">+5</button>
+            <button type="button" class="amount-tag-btn" data-amount="10">+10</button>
+            <button type="button" class="amount-tag-btn" data-amount="20">+20</button>
+            <button type="button" class="amount-tag-btn" data-amount="50">+50</button>
+            <button type="button" class="amount-tag-btn" data-amount="100">+100</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="presetReasonSelect">자주 쓰는 사유 선택</label>
+          <select id="presetReasonSelect" class="form-select">
+            <option value="">직접 입력 또는 선택...</option>
+            <option value="수업 참여 및 적극적인 발표">수업 참여 및 적극적인 발표 (+)</option>
+            <option value="1인 1역 임무 성실 수행">1인 1역 임무 성실 수행 (+)</option>
+            <option value="친구 돕기 및 바른 인성 실천">친구 돕기 및 바른 인성 실천 (+)</option>
+            <option value="교실 정리정돈 및 환경 미화">교실 정리정돈 및 환경 미화 (+)</option>
+            <option value="숙제 미제출 / 준비물 미지참">숙제 미제출 / 준비물 미지참 (-)</option>
+            <option value="교실 내 규칙 위반">교실 내 규칙 위반 (-)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="payReasonInput">사유 상세 입력</label>
+          <input type="text" id="payReasonInput" class="form-input" value="수업 참여 및 발표 우수" placeholder="사유를 입력하세요">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnSubmitDeduct" class="btn btn-soft-neutral" type="button" style="color: var(--danger-color);">
+          차감하기 (-)
+        </button>
+        <button id="btnSubmitDeposit" class="btn btn-cta-orange" type="button">
+          화폐 지급 확정 (+)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Bulk Pay Modal -->
+  <div id="bulkPayModal" class="modal-backdrop">
+    <div class="modal-content-card">
+      <div class="modal-header">
+        <h3>🎁 전체 학생 일괄 화폐 지급</h3>
+        <button class="btn-modal-close" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14px; color: var(--text-secondary);">
+          현재 등록된 <strong>전체 25명</strong>의 학생 모두에게 동일한 금액을 한 번에 지급합니다.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="bulkAmountInput">1인당 지급할 금액</label>
+          <input type="number" id="bulkAmountInput" class="form-input" min="1" value="10" placeholder="금액 입력">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="bulkReasonInput">지급 사유</label>
+          <input type="text" id="bulkReasonInput" class="form-input" value="학급 전체 기본 일급 지급" placeholder="지급 사유 입력">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-soft-neutral btn-modal-cancel" type="button">취소</button>
+        <button id="btnConfirmBulkPay" class="btn btn-cta-orange" type="button">
+          25명 전원 지급 실행
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Add Store Product Modal -->
+  <div id="addProductModal" class="modal-backdrop">
+    <div class="modal-content-card">
+      <div class="modal-header">
+        <h3>🛒 상점 새 상품 등록</h3>
+        <button class="btn-modal-close" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="newProdName">상품/쿠폰 이름</label>
+          <input type="text" id="newProdName" class="form-input" placeholder="예: 5분 자유시간권, 스티커 세트">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="newProdPrice">가격 (골드)</label>
+            <input type="number" id="newProdPrice" class="form-input" min="1" value="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newProdStock">초기 재고 (개)</label>
+            <input type="number" id="newProdStock" class="form-input" min="1" value="5">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="newProdIcon">아이콘 (이모지)</label>
+          <select id="newProdIcon" class="form-select">
+            <option value="🎟️">🎟️ 티켓 / 쿠폰</option>
+            <option value="🪑">🪑 자리 바꾸기</option>
+            <option value="🧹">🧹 청소 면제</option>
+            <option value="🎁">🎁 선물 / 간식</option>
+            <option value="🎵">🎵 음악 신청</option>
+            <option value="📚">📚 도서 / 학습</option>
+            <option value="✨">✨ 특별 혜택</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="newProdDesc">상품 설명</label>
+          <textarea id="newProdDesc" class="form-textarea" rows="2" placeholder="아이들에게 매력적인 상품 설명을 적어주세요"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-soft-neutral btn-modal-cancel" type="button">취소</button>
+        <button id="btnConfirmAddProduct" class="btn btn-cta-orange" type="button">
+          상품 등록 완료
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Use Coupon Confirmation -->
+  <div id="useCouponModal" class="modal-backdrop">
+    <div class="modal-content-card">
+      <div class="modal-header">
+        <h3>🎟️ 쿠폰 사용 확인</h3>
+        <button class="btn-modal-close" type="button">✕</button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: 20px 0;">
+        <div id="useCouponName" style="font-size: 20px; font-weight: 800; color: var(--blue-primary); margin-bottom: 12px;">
+          쿠폰명
+        </div>
+        <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.6;">
+          선생님께 쿠폰을 보여드리고 승인을 받으셨나요?<br>
+          <strong>[사용 완료]</strong>를 누르면 쿠폰이 소진 처리됩니다.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-soft-neutral btn-modal-cancel" type="button">아직 사용 안 함</button>
+        <button id="btnConfirmUseCoupon" class="btn btn-cta-orange" type="button">
+          지금 사용 완료하기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
